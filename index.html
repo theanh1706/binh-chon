@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b57d0">
   <title>Bình chọn trực tuyến</title>
+  <!-- PHIEN BAN V3: BO PHIEU 2 PHUT -->
   <style>
     :root {
       --primary: #0b57d0;
@@ -395,7 +396,7 @@
     async function refreshStatus(force = false) {
       if (statusRefreshing) return;
       statusRefreshing = true;
-      const { data, error } = await supabaseClient.rpc("get_voting_status");
+      const { data, error } = await supabaseClient.rpc("vote_status_v3");
       statusRefreshing = false;
 
       if (error) {
@@ -445,7 +446,7 @@
       submitting = true;
       document.querySelectorAll(".vote-btn").forEach(btn => btn.disabled = true);
 
-      const { data, error } = await supabaseClient.rpc("submit_vote", {
+      const { data, error } = await supabaseClient.rpc("vote_submit_v3", {
         p_candidate_id: candidateId,
         p_voter_token: getVoterToken()
       });
@@ -474,7 +475,7 @@
     }
 
     async function loadResults() {
-      const { data, error } = await supabaseClient.rpc("get_vote_results");
+      const { data, error } = await supabaseClient.rpc("vote_results_v3");
 
       if (error) {
         console.error(error);
