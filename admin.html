@@ -5,96 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b57d0">
   <title>Quản trị bình chọn</title>
-  <!-- PHIEN BAN V3: DUNG CAC RPC TEN MOI DE TRANH XUNG DOT HAM CU -->
   <style>
-    * { box-sizing: border-box; }
+    * { box-sizing:border-box; }
     body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 20px;
-      font-family: Arial, Helvetica, sans-serif;
-      color: #172033;
-      background: linear-gradient(135deg, #eef5ff, #f7f9fd);
+      margin:0; min-height:100vh; display:grid; place-items:center; padding:20px;
+      font-family:Arial,Helvetica,sans-serif; color:#172033;
+      background:linear-gradient(135deg,#eef5ff,#f7f9fd);
     }
     .card {
-      width: min(540px, 100%);
-      padding: 28px;
-      border: 1px solid #dbe3ef;
-      border-radius: 20px;
-      background: #fff;
-      box-shadow: 0 18px 50px rgba(34,53,84,.16);
+      width:min(540px,100%); padding:28px; border:1px solid #dbe3ef;
+      border-radius:20px; background:#fff; box-shadow:0 18px 50px rgba(34,53,84,.16);
     }
-    h1 { margin: 0; color: #073b91; text-align: center; font-size: 31px; }
-    .desc { margin: 10px 0 22px; color: #687386; text-align: center; line-height: 1.5; }
-    .version {
-      margin: -10px 0 18px;
-      color: #8793a5;
-      text-align: center;
-      font-size: 12px;
-    }
-    .status-box {
-      margin-bottom: 20px;
-      padding: 18px;
-      border-radius: 14px;
-      background: #f2f6fc;
-      text-align: center;
-    }
-    .status-title { color: #687386; font-size: 13px; font-weight: 800; letter-spacing: .06em; }
-    .timer {
-      margin-top: 5px;
-      color: #073b91;
-      font-size: 48px;
-      font-weight: 900;
-      font-variant-numeric: tabular-nums;
-    }
-    label { display: block; margin-bottom: 7px; font-weight: 800; }
+    h1 { margin:0; color:#073b91; text-align:center; font-size:31px; }
+    .desc { margin:10px 0 8px; color:#687386; text-align:center; line-height:1.5; }
+    .version { margin:0 0 18px; color:#8793a5; text-align:center; font-size:12px; }
+    .status-box { margin-bottom:20px; padding:18px; border-radius:14px; background:#f2f6fc; text-align:center; }
+    .status-title { color:#687386; font-size:13px; font-weight:800; letter-spacing:.06em; }
+    .timer { margin-top:5px; color:#073b91; font-size:48px; font-weight:900; font-variant-numeric:tabular-nums; }
+    label { display:block; margin-bottom:7px; font-weight:800; }
     input {
-      width: 100%;
-      padding: 13px 14px;
-      border: 1px solid #bac9dd;
-      border-radius: 10px;
-      font: inherit;
-      outline: none;
+      width:100%; padding:13px 14px; border:1px solid #bac9dd;
+      border-radius:10px; font:inherit; outline:none;
     }
-    input:focus { border-color: #0b57d0; box-shadow: 0 0 0 3px rgba(11,87,208,.12); }
+    input:focus { border-color:#0b57d0; box-shadow:0 0 0 3px rgba(11,87,208,.12); }
     button {
-      width: 100%;
-      margin-top: 14px;
-      padding: 14px;
-      border: 0;
-      border-radius: 11px;
-      color: #fff;
-      background: linear-gradient(135deg, #0b57d0, #2477e8);
-      font: inherit;
-      font-weight: 900;
-      cursor: pointer;
+      width:100%; margin-top:14px; padding:14px; border:0; border-radius:11px;
+      color:#fff; background:linear-gradient(135deg,#0b57d0,#2477e8);
+      font:inherit; font-weight:900; cursor:pointer;
     }
-    button:disabled { opacity: .55; cursor: not-allowed; }
+    button:disabled { opacity:.55; cursor:not-allowed; }
+    .reset-btn {
+      background:linear-gradient(135deg,#b42318,#e5484d);
+      box-shadow:0 8px 18px rgba(180,35,24,.20);
+    }
     .notice {
-      display: none;
-      margin-top: 16px;
-      padding: 12px;
-      border-radius: 10px;
-      text-align: center;
-      font-weight: 700;
-      line-height: 1.45;
-      overflow-wrap: anywhere;
+      display:none; margin-top:16px; padding:12px; border-radius:10px;
+      text-align:center; font-weight:700; line-height:1.45; overflow-wrap:anywhere;
     }
-    .notice.show { display: block; }
-    .notice.ok { color: #0b6f31; background: #e9f8ef; border: 1px solid #bde8cc; }
-    .notice.error { color: #9d1e1e; background: #fff0f0; border: 1px solid #f0c7c7; }
-    .notice.info { color: #174d91; background: #edf5ff; border: 1px solid #c9ddf8; }
-    .warning { margin: 18px 0 0; color: #8b4c00; font-size: 13px; line-height: 1.5; text-align: center; }
-    a { color: #0b57d0; font-weight: 700; }
+    .notice.show { display:block; }
+    .notice.ok { color:#0b6f31; background:#e9f8ef; border:1px solid #bde8cc; }
+    .notice.error { color:#9d1e1e; background:#fff0f0; border:1px solid #f0c7c7; }
+    .notice.info { color:#174d91; background:#edf5ff; border:1px solid #c9ddf8; }
+    .warning { margin:18px 0 0; color:#8b4c00; font-size:13px; line-height:1.5; text-align:center; }
+    a { color:#0b57d0; font-weight:700; }
   </style>
 </head>
 <body>
   <main class="card">
     <h1>Quản trị bình chọn</h1>
-    <p class="desc">Nhấn bắt đầu để mở bình chọn trong đúng 2 phút. Mỗi lần bắt đầu sẽ xóa toàn bộ phiếu của vòng trước.</p>
-    <p class="version">Phiên bản sửa lỗi V3</p>
+    <p class="desc">Nhấn bắt đầu để mở bình chọn trong đúng 2 phút. Nút Reset sẽ xóa toàn bộ phiếu và đưa hệ thống về trạng thái ban đầu.</p>
+    <p class="version">Phiên bản V4 – có nút Reset toàn bộ</p>
 
     <section class="status-box" aria-live="polite">
       <div id="statusTitle" class="status-title">ĐANG KIỂM TRA</div>
@@ -105,55 +65,95 @@
     <input id="password" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu quản trị">
 
     <button id="startBtn" type="button">BẮT ĐẦU BÌNH CHỌN 2 PHÚT</button>
-
+    <button id="resetBtn" class="reset-btn" type="button">RESET TOÀN BỘ HỆ THỐNG</button>
     <div id="notice" class="notice" role="status" aria-live="polite"></div>
+
     <p class="warning">Trang bình chọn: <a href="./index.html" target="_blank" rel="noopener">mở tại đây</a>.</p>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = "https://eetciufgtzxrxybteraz.supabase.co";
-    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_jXMUla3Oq6exg4yglQ92KA_NUV3hrFS";
 
-    const supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
-    );
+    const SUPABASE_URL = 'https://eetciufgtzxrxybteraz.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_jXMUla3Oq6exg4yglQ92KA_NUV3hrFS';
+
+    async function supabaseRequest(path, options = {}) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 12000);
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+          ...options,
+          signal: controller.signal,
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+          }
+        });
+
+        const text = await response.text();
+        let data = null;
+
+        if (text) {
+          try {
+            data = JSON.parse(text);
+          } catch {
+            data = text;
+          }
+        }
+
+        if (!response.ok) {
+          const details =
+            data?.message ||
+            data?.details ||
+            (typeof data === "string" ? data : `HTTP ${response.status}`);
+          throw new Error(details);
+        }
+
+        return data;
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+
+    function rpc(functionName, params = {}) {
+      return supabaseRequest(`rpc/${functionName}`, {
+        method: "POST",
+        body: JSON.stringify(params)
+      });
+    }
+
 
     const statusTitle = document.getElementById("statusTitle");
     const timer = document.getElementById("timer");
     const password = document.getElementById("password");
     const startBtn = document.getElementById("startBtn");
+    const resetBtn = document.getElementById("resetBtn");
     const notice = document.getElementById("notice");
 
-    let status = { phase: "loading" };
+    let status = { phase:"loading" };
     let statusRefreshing = false;
     let serverOffsetMs = 0;
 
-    function showNotice(message, type = "info") {
+    function showNotice(message,type="info") {
       notice.textContent = message;
       notice.className = `notice show ${type}`;
     }
 
     function formatTime(seconds) {
-      const safe = Math.max(0, Number(seconds) || 0);
-      const minutes = Math.floor(safe / 60);
-      const secs = safe % 60;
-      return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+      const safe = Math.max(0,Number(seconds) || 0);
+      return `${String(Math.floor(safe/60)).padStart(2,"0")}:${String(safe%60).padStart(2,"0")}`;
     }
 
     function updateDisplay() {
       if (status.phase === "active" && status.ends_at) {
         const remaining = Math.max(
           0,
-          Math.ceil(
-            (new Date(status.ends_at).getTime() - (Date.now() + serverOffsetMs)) / 1000
-          )
+          Math.ceil((new Date(status.ends_at).getTime() - (Date.now() + serverOffsetMs))/1000)
         );
-
         statusTitle.textContent = "ĐANG BÌNH CHỌN";
         timer.textContent = formatTime(remaining);
-
         if (remaining <= 0) refreshStatus();
         return;
       }
@@ -174,88 +174,122 @@
       timer.textContent = "--:--";
     }
 
-    function describeError(error) {
-      if (!error) return "Lỗi không xác định.";
-      const parts = [
-        error.message,
-        error.details,
-        error.hint,
-        error.code ? `Mã lỗi: ${error.code}` : ""
-      ].filter(Boolean);
-      return parts.join(" — ");
-    }
-
     async function refreshStatus() {
       if (statusRefreshing) return;
-
       statusRefreshing = true;
-      const { data, error } = await supabaseClient.rpc("vote_status_v3");
-      statusRefreshing = false;
 
-      if (error) {
-        console.error("vote_status_v3:", error);
-        showNotice(`Không kiểm tra được trạng thái: ${describeError(error)}`, "error");
-        return;
+      try {
+        const data = await rpc("vote_status_v3");
+        status = data || { phase:"not_started" };
+
+        if (status.server_now) {
+          serverOffsetMs = new Date(status.server_now).getTime() - Date.now();
+        }
+        updateDisplay();
+      } catch (error) {
+        console.error(error);
+        showNotice(`Không kiểm tra được trạng thái: ${error.message}`,"error");
+      } finally {
+        statusRefreshing = false;
       }
-
-      status = data || { phase: "not_started" };
-
-      if (status.server_now) {
-        serverOffsetMs = new Date(status.server_now).getTime() - Date.now();
-      }
-
-      updateDisplay();
     }
 
     async function startVoting() {
       const value = password.value.trim();
 
       if (!value) {
-        showNotice("Hãy nhập mật khẩu quản trị.", "error");
+        showNotice("Hãy nhập mật khẩu quản trị.","error");
         password.focus();
         return;
       }
 
-      const confirmed = window.confirm(
-        "Bắt đầu vòng bình chọn mới trong 2 phút? Phiếu của vòng trước sẽ bị xóa."
-      );
-      if (!confirmed) return;
+      if (!confirm("Bắt đầu vòng mới trong 2 phút? Phiếu của vòng trước sẽ bị xóa.")) return;
 
       startBtn.disabled = true;
       startBtn.textContent = "ĐANG BẮT ĐẦU...";
-      showNotice("Đang gửi lệnh bắt đầu đến Supabase...", "info");
+      showNotice("Đang gửi lệnh bắt đầu đến Supabase...","info");
 
-      const { data, error } = await supabaseClient.rpc("vote_start_v3", {
-        p_password: value
-      });
+      try {
+        const data = await rpc("vote_start_v3", { p_password:value });
 
-      startBtn.disabled = false;
-      startBtn.textContent = "BẮT ĐẦU BÌNH CHỌN 2 PHÚT";
+        if (!data || data.success !== true) {
+          showNotice(data?.message || "Không thể bắt đầu bình chọn.","error");
+          return;
+        }
 
-      if (error) {
-        console.error("vote_start_v3:", error);
-        showNotice(`Lỗi Supabase: ${describeError(error)}`, "error");
-        return;
+        password.value = "";
+        showNotice("Đã bắt đầu! Đồng hồ 2 phút đang chạy.","ok");
+        await refreshStatus();
+      } catch (error) {
+        console.error(error);
+        showNotice(`Lỗi Supabase: ${error.message}`,"error");
+      } finally {
+        startBtn.disabled = false;
+        startBtn.textContent = "BẮT ĐẦU BÌNH CHỌN 2 PHÚT";
       }
-
-      if (!data || data.success !== true) {
-        showNotice(data?.message || "Không thể bắt đầu bình chọn.", "error");
-        return;
-      }
-
-      password.value = "";
-      showNotice("Đã bắt đầu! Đồng hồ 2 phút đang chạy.", "ok");
-      await refreshStatus();
     }
 
-    startBtn.addEventListener("click", startVoting);
-    password.addEventListener("keydown", event => {
+
+    async function resetVoting() {
+      const value = password.value.trim();
+
+      if (!value) {
+        showNotice("Hãy nhập mật khẩu quản trị trước khi reset.","error");
+        password.focus();
+        return;
+      }
+
+      const confirmed = confirm(
+        "RESET TOÀN BỘ HỆ THỐNG?\n\n" +
+        "Thao tác này sẽ:\n" +
+        "• Dừng cuộc bình chọn hiện tại\n" +
+        "• Xóa toàn bộ phiếu đã bình chọn\n" +
+        "• Đưa đồng hồ về trạng thái chưa bắt đầu\n" +
+        "• Cho tất cả thiết bị được bình chọn lại ở vòng tiếp theo"
+      );
+
+      if (!confirmed) return;
+
+      startBtn.disabled = true;
+      resetBtn.disabled = true;
+      resetBtn.textContent = "ĐANG RESET...";
+      showNotice("Đang reset toàn bộ hệ thống...","info");
+
+      try {
+        const data = await rpc("vote_reset_v3", { p_password:value });
+
+        if (!data || data.success !== true) {
+          showNotice(data?.message || "Không thể reset hệ thống.","error");
+          return;
+        }
+
+        password.value = "";
+        status = { phase:"not_started", starts_at:null, ends_at:null };
+        updateDisplay();
+        showNotice(
+          "Đã reset thành công. Toàn bộ phiếu đã xóa và mọi thiết bị có thể bình chọn lại ở vòng mới.",
+          "ok"
+        );
+        await refreshStatus();
+      } catch (error) {
+        console.error(error);
+        showNotice(`Lỗi Supabase khi reset: ${error.message}`,"error");
+      } finally {
+        startBtn.disabled = false;
+        resetBtn.disabled = false;
+        resetBtn.textContent = "RESET TOÀN BỘ HỆ THỐNG";
+      }
+    }
+
+    startBtn.addEventListener("click",startVoting);
+    resetBtn.addEventListener("click",resetVoting);
+    password.addEventListener("keydown",event => {
       if (event.key === "Enter") startVoting();
     });
 
     refreshStatus();
-    setInterval(updateDisplay, 250);
-    setInterval(refreshStatus, 3000);
+    setInterval(updateDisplay,250);
+    setInterval(refreshStatus,3000);
   </script>
 </body>
 </html>
