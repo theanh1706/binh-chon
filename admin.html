@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quản trị bình chọn</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #172033;
+      background: linear-gradient(135deg, #eef5ff, #f7f9fd);
+    }
+    .card {
+      width: min(520px, 100%);
+      padding: 28px;
+      border: 1px solid #dbe3ef;
+      border-radius: 20px;
+      background: #fff;
+      box-shadow: 0 18px 50px rgba(34,53,84,.16);
+    }
+    h1 { margin: 0; color: #073b91; text-align: center; font-size: 31px; }
+    .desc { margin: 10px 0 22px; color: #687386; text-align: center; line-height: 1.5; }
+    .status-box { margin-bottom: 20px; padding: 18px; border-radius: 14px; background: #f2f6fc; text-align: center; }
+    .status-title { color: #687386; font-size: 13px; font-weight: 800; letter-spacing: .06em; }
+    .timer { margin-top: 5px; color: #073b91; font-size: 48px; font-weight: 900; font-variant-numeric: tabular-nums; }
+    label { display: block; margin-bottom: 7px; font-weight: 800; }
+    input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #bac9dd;
+      border-radius: 10px;
+      font: inherit;
+      outline: none;
+    }
+    input:focus { border-color: #0b57d0; box-shadow: 0 0 0 3px rgba(11,87,208,.12); }
+    button {
+      width: 100%;
+      margin-top: 14px;
+      padding: 14px;
+      border: 0;
+      border-radius: 11px;
+      color: #fff;
+      background: linear-gradient(135deg, #0b57d0, #2477e8);
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    .notice { display: none; margin-top: 16px; padding: 12px; border-radius: 10px; text-align: center; font-weight: 700; }
+    .notice.show { display: block; }
+    .notice.ok { color: #0b6f31; background: #e9f8ef; border: 1px solid #bde8cc; }
+    .notice.error { color: #9d1e1e; background: #fff0f0; border: 1px solid #f0c7c7; }
+    .warning { margin: 18px 0 0; color: #8b4c00; font-size: 13px; line-height: 1.5; text-align: center; }
+    a { color: #0b57d0; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Quản trị bình chọn</h1>
+    <p class="desc">Nhấn bắt đầu để mở bình chọn trong đúng 2 phút. Mỗi lần bắt đầu sẽ xóa toàn bộ phiếu của vòng trước.</p>
+
+    <section class="status-box" aria-live="polite">
+      <div id="statusTitle" class="status-title">ĐANG KIỂM TRA</div>
+      <div id="timer" class="timer">--:--</div>
+    </section>
+
+    <label for="password">Mật khẩu quản trị</label>
+    <input id="password" type="password" autocomplete="current-password" placeholder="Nhập mật khẩu quản trị">
+    <button id="startBtn" type="button">BẮT ĐẦU BÌNH CHỌN 2 PHÚT</button>
+
+    <div id="notice" class="notice" role="status"></div>
+    <p class="warning">Chỉ người quản trị được dùng trang này. Trang bình chọn: <a href="./index.html" target="_blank">mở tại đây</a>.</p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://eetciufgtzxrxybteraz.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_jXMUla3Oq6exg4yglQ92KA_NUV3hrFS";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+    const statusTitle = document.getElementById("statusTitle");
+    const timer = document.getElementById("timer");
+    const password = document.getElementById("password");
+    const startBtn = document.getElementById("startBtn");
+    const notice = document.getElementById("notice");
+    let status = { phase: "loading" };
+    let statusRefreshing = false;
+    let serverOffsetMs = 0;
+
+    function showNotice(message, type) {
+      notice.textContent = message;
+      notice.className = `notice show ${type}`;
+    }
+
+    function formatTime(seconds) {
+      const safe = Math.max(0, Number(seconds) || 0);
+      return `${String(Math.floor(safe / 60)).padStart(2, "0")}:${String(safe % 60).padStart(2, "0")}`;
+    }
+
+    function updateDisplay() {
+      if (status.phase === "active" && status.ends_at) {
+        const remaining = Math.max(0, Math.ceil((new Date(status.ends_at).getTime() - (Date.now() + serverOffsetMs)) / 1000));
+        statusTitle.textContent = "ĐANG BÌNH CHỌN";
+        timer.textContent = formatTime(remaining);
+        if (remaining <= 0) refreshStatus();
+      } else if (status.phase === "ended") {
+        statusTitle.textContent = "ĐÃ KẾT THÚC";
+        timer.textContent = "00:00";
+      } else if (status.phase === "not_started") {
+        statusTitle.textContent = "CHƯA BẮT ĐẦU";
+        timer.textContent = "02:00";
+      } else {
+        statusTitle.textContent = "ĐANG KIỂM TRA";
+        timer.textContent = "--:--";
+      }
+    }
+
+    async function refreshStatus() {
+      if (statusRefreshing) return;
+      statusRefreshing = true;
+      const { data, error } = await supabaseClient.rpc("get_voting_status");
+      statusRefreshing = false;
+      if (error) {
+        console.error(error);
+        showNotice("Không thể kiểm tra trạng thái Supabase.", "error");
+        return;
+      }
+      status = data || { phase: "not_started" };
+      if (status.server_now) {
+        serverOffsetMs = new Date(status.server_now).getTime() - Date.now();
+      }
+      updateDisplay();
+    }
+
+    async function startVoting() {
+      const value = password.value.trim();
+      if (!value) {
+        showNotice("Hãy nhập mật khẩu quản trị.", "error");
+        password.focus();
+        return;
+      }
+
+      if (!confirm("Bắt đầu vòng bình chọn mới trong 2 phút? Phiếu của vòng trước sẽ bị xóa.")) return;
+
+      startBtn.disabled = true;
+      startBtn.textContent = "ĐANG BẮT ĐẦU...";
+
+      const { data, error } = await supabaseClient.rpc("start_voting", {
+        p_admin_password: value
+      });
+
+      startBtn.disabled = false;
+      startBtn.textContent = "BẮT ĐẦU BÌNH CHỌN 2 PHÚT";
+
+      if (error) {
+        console.error(error);
+        showNotice("Không thể bắt đầu bình chọn.", "error");
+        return;
+      }
+
+      if (!data || data.success !== true) {
+        showNotice(data?.message || "Mật khẩu không đúng.", "error");
+        return;
+      }
+
+      password.value = "";
+      showNotice("Đã bắt đầu! Đồng hồ 2 phút đang chạy.", "ok");
+      await refreshStatus();
+    }
+
+    startBtn.addEventListener("click", startVoting);
+    password.addEventListener("keydown", event => {
+      if (event.key === "Enter") startVoting();
+    });
+
+    refreshStatus();
+    setInterval(updateDisplay, 250);
+    setInterval(refreshStatus, 3000);
+  </script>
+</body>
+</html>

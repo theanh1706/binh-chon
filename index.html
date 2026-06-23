@@ -1,11 +1,10 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0b57d0" />
-  <title>Bình chọn</title>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b57d0">
+  <title>Bình chọn trực tuyến</title>
   <style>
     :root {
       --primary: #0b57d0;
@@ -17,6 +16,7 @@
       --border: #dbe3ef;
       --success: #11823b;
       --danger: #c62828;
+      --warning: #9a5a00;
       --shadow: 0 10px 30px rgba(34, 53, 84, 0.12);
     }
 
@@ -35,13 +35,10 @@
     .page {
       width: min(1080px, calc(100% - 28px));
       margin: 0 auto;
-      padding: 34px 0 52px;
+      padding: 28px 0 52px;
     }
 
-    .hero {
-      text-align: center;
-      margin-bottom: 28px;
-    }
+    .hero { text-align: center; margin-bottom: 20px; }
 
     .eyebrow {
       display: inline-block;
@@ -50,36 +47,66 @@
       border-radius: 999px;
       color: var(--primary);
       background: rgba(11, 87, 208, 0.09);
-      font-weight: 700;
+      font-weight: 800;
       font-size: 13px;
-      letter-spacing: 0.06em;
+      letter-spacing: .06em;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(30px, 6vw, 54px);
-      line-height: 1.05;
       color: var(--primary-dark);
+      font-size: clamp(30px, 6vw, 52px);
+      line-height: 1.08;
     }
 
     .subtitle {
-      margin: 13px auto 0;
-      max-width: 650px;
+      margin: 12px auto 0;
+      max-width: 690px;
       color: var(--muted);
       font-size: 17px;
-      line-height: 1.55;
+      line-height: 1.5;
     }
+
+    .timer-card {
+      max-width: 560px;
+      margin: 20px auto 24px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(255,255,255,.95);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .status-label {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .countdown {
+      margin-top: 5px;
+      color: var(--primary-dark);
+      font-size: clamp(42px, 10vw, 70px);
+      line-height: 1;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .countdown.waiting { font-size: clamp(24px, 5vw, 34px); line-height: 1.2; }
+    .countdown.ended { color: var(--danger); font-size: clamp(25px, 5vw, 38px); }
 
     .notice {
       display: none;
-      margin: 0 auto 22px;
+      margin: 0 auto 20px;
       max-width: 760px;
       padding: 13px 16px;
       border-radius: 12px;
       font-weight: 700;
       text-align: center;
     }
-
     .notice.show { display: block; }
     .notice.success { color: #0b6f31; background: #e9f8ef; border: 1px solid #bde8cc; }
     .notice.error { color: #9d1e1e; background: #fff0f0; border: 1px solid #f0c7c7; }
@@ -92,20 +119,14 @@
     }
 
     .candidate {
-      position: relative;
       overflow: hidden;
       border: 1px solid var(--border);
       border-radius: 18px;
       background: var(--card);
       box-shadow: var(--shadow);
-      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+      transition: transform .2s ease, box-shadow .2s ease;
     }
-
-    .candidate:hover {
-      transform: translateY(-4px);
-      border-color: rgba(11, 87, 208, 0.45);
-      box-shadow: 0 15px 36px rgba(34, 53, 84, 0.17);
-    }
+    .candidate:hover { transform: translateY(-4px); box-shadow: 0 15px 36px rgba(34,53,84,.17); }
 
     .photo {
       width: 100%;
@@ -116,20 +137,11 @@
       background: linear-gradient(135deg, #e9f1ff, #d7e5fb);
       color: var(--primary);
       font-size: 54px;
-      font-weight: 800;
+      font-weight: 900;
     }
+    .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    .photo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .candidate-body {
-      padding: 16px;
-      text-align: center;
-    }
+    .candidate-body { padding: 16px; text-align: center; }
 
     .candidate-name {
       min-height: 48px;
@@ -141,11 +153,7 @@
       line-height: 1.25;
     }
 
-    button {
-      border: 0;
-      cursor: pointer;
-      font: inherit;
-    }
+    button { border: 0; cursor: pointer; font: inherit; }
 
     .vote-btn {
       width: 100%;
@@ -153,35 +161,14 @@
       border-radius: 11px;
       color: #fff;
       background: linear-gradient(135deg, var(--primary), #2477e8);
-      font-weight: 800;
-      box-shadow: 0 8px 18px rgba(11, 87, 208, 0.24);
+      font-weight: 900;
+      box-shadow: 0 8px 18px rgba(11,87,208,.24);
     }
-
-    .vote-btn:hover { filter: brightness(1.05); }
-    .vote-btn:disabled {
-      cursor: not-allowed;
-      opacity: 0.55;
-      box-shadow: none;
-    }
-
-    .toolbar {
-      display: flex;
-      justify-content: center;
-      margin-top: 24px;
-    }
-
-    .secondary-btn {
-      padding: 11px 18px;
-      border-radius: 10px;
-      color: var(--primary);
-      background: #fff;
-      border: 1px solid #bdd1ed;
-      font-weight: 700;
-    }
+    .vote-btn:disabled { cursor: not-allowed; opacity: .48; box-shadow: none; }
 
     .loading {
       grid-column: 1 / -1;
-      padding: 50px 20px;
+      padding: 45px 20px;
       text-align: center;
       color: var(--muted);
       font-size: 18px;
@@ -196,15 +183,8 @@
       background: #fff;
       box-shadow: var(--shadow);
     }
-
     .results.show { display: block; }
-
-    .results h2 {
-      margin: 0 0 18px;
-      text-align: center;
-      color: var(--primary-dark);
-      font-size: 28px;
-    }
+    .results h2 { margin: 0 0 18px; text-align: center; color: var(--primary-dark); font-size: 29px; }
 
     .result-row {
       display: grid;
@@ -213,82 +193,39 @@
       align-items: center;
       margin: 14px 0;
     }
+    .result-name { font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bar { height: 22px; overflow: hidden; border-radius: 999px; background: #e8eef7; }
+    .bar-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--primary), #3f8cff); transition: width .65s ease; }
+    .result-number { text-align: right; font-weight: 900; color: var(--primary-dark); }
+    .result-votes { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; font-weight: 400; }
 
-    .result-name {
-      font-weight: 700;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+    .footer-note { margin: 25px auto 0; color: var(--muted); text-align: center; font-size: 13px; }
 
-    .bar {
-      height: 22px;
-      overflow: hidden;
-      border-radius: 999px;
-      background: #e8eef7;
-    }
-
-    .bar-fill {
-      height: 100%;
-      min-width: 0;
-      border-radius: inherit;
-      background: linear-gradient(90deg, var(--primary), #3f8cff);
-      transition: width .65s ease;
-    }
-
-    .result-number {
-      text-align: right;
-      font-weight: 800;
-      color: var(--primary-dark);
-    }
-
-    .result-votes {
-      display: block;
-      margin-top: 2px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 400;
-    }
-
-    .footer-note {
-      margin: 26px auto 0;
-      max-width: 700px;
-      color: var(--muted);
-      text-align: center;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    @media (max-width: 900px) {
-      .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    }
-
+    @media (max-width: 900px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     @media (max-width: 620px) {
-      .page { width: min(100% - 20px, 1080px); padding-top: 22px; }
+      .page { width: min(100% - 20px, 1080px); padding-top: 20px; }
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
       .candidate-body { padding: 12px; }
       .candidate-name { min-height: 42px; font-size: 16px; }
       .vote-btn { padding: 11px 7px; font-size: 15px; }
-      .results { padding: 18px 14px; }
-      .result-row {
-        grid-template-columns: 105px 1fr 64px;
-        gap: 8px;
-      }
-      .result-name { font-size: 14px; }
-      .result-number { font-size: 14px; }
+      .results { padding: 18px 13px; }
+      .result-row { grid-template-columns: 105px 1fr 64px; gap: 8px; }
+      .result-name, .result-number { font-size: 14px; }
     }
   </style>
 </head>
-
 <body>
   <main class="page">
     <header class="hero">
       <div class="eyebrow">BÌNH CHỌN TRỰC TUYẾN</div>
       <h1>Hãy chọn người bạn yêu thích</h1>
-      <p class="subtitle">
-        Mỗi thiết bị được bình chọn một lần. Kết quả sẽ xuất hiện ngay sau khi bạn bình chọn.
-      </p>
+      <p class="subtitle">Chỉ có thể bình chọn trong thời gian 2 phút. Kết quả chỉ xuất hiện sau khi đồng hồ kết thúc.</p>
     </header>
+
+    <section class="timer-card" aria-live="polite">
+      <div id="statusLabel" class="status-label">Đang kiểm tra trạng thái</div>
+      <div id="countdown" class="countdown waiting">Vui lòng chờ...</div>
+    </section>
 
     <div id="notice" class="notice" role="status" aria-live="polite"></div>
 
@@ -296,38 +233,43 @@
       <div class="loading">Đang tải danh sách...</div>
     </section>
 
-    <div class="toolbar">
-      <button id="viewResultsBtn" class="secondary-btn" type="button">Xem kết quả</button>
-    </div>
-
     <section id="results" class="results" aria-label="Kết quả bình chọn">
       <h2>Kết quả bình chọn</h2>
       <div id="resultList"></div>
     </section>
 
-    <p class="footer-note">
-      Phiếu bình chọn được lưu trực tiếp vào cơ sở dữ liệu Supabase.
-    </p>
+    <p class="footer-note">Mỗi trình duyệt chỉ bình chọn một lần trong mỗi vòng.</p>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://eetciufgtzxrxybteraz.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_jXMUla3Oq6exg4yglQ92KA_NUV3hrFS";
-
-    const supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
-    );
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
     const grid = document.getElementById("candidateGrid");
     const notice = document.getElementById("notice");
+    const statusLabel = document.getElementById("statusLabel");
+    const countdown = document.getElementById("countdown");
     const resultsBox = document.getElementById("results");
     const resultList = document.getElementById("resultList");
-    const viewResultsBtn = document.getElementById("viewResultsBtn");
 
     let candidates = [];
-    let isSubmitting = false;
+    let status = { phase: "loading", starts_at: null, ends_at: null };
+    let submitting = false;
+    let lastPhase = null;
+    let timerHandle = null;
+    let statusRefreshing = false;
+    let serverOffsetMs = 0;
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
 
     function showNotice(message, type = "info") {
       notice.textContent = message;
@@ -339,29 +281,34 @@
       notice.className = "notice";
     }
 
+    function initials(name) {
+      return String(name || "?")
+        .trim().split(/\s+/).slice(-2)
+        .map(part => part.charAt(0)).join("").toUpperCase();
+    }
+
     function getVoterToken() {
       let token = localStorage.getItem("vote_voter_token");
-
       if (!token) {
         token = crypto.randomUUID();
         localStorage.setItem("vote_voter_token", token);
       }
-
       return token;
     }
 
-    function hasVotedLocally() {
-      return localStorage.getItem("vote_completed") === "true";
+    function sessionKey() {
+      return status.starts_at || "no-session";
     }
 
-    function initials(name) {
-      return String(name || "?")
-        .trim()
-        .split(/\s+/)
-        .slice(-2)
-        .map(part => part.charAt(0))
-        .join("")
-        .toUpperCase();
+    function hasVotedLocally() {
+      return localStorage.getItem("vote_completed_session") === sessionKey();
+    }
+
+    function formatTime(seconds) {
+      const safe = Math.max(0, Number(seconds) || 0);
+      const minutes = Math.floor(safe / 60);
+      const secs = safe % 60;
+      return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
     }
 
     function renderCandidates() {
@@ -370,29 +317,27 @@
         return;
       }
 
-      const alreadyVoted = hasVotedLocally();
+      const active = status.phase === "active";
+      const alreadyVoted = active && hasVotedLocally();
 
       grid.innerHTML = candidates.map(candidate => {
         const image = candidate.image_url
           ? `<img src="${escapeHtml(candidate.image_url)}" alt="${escapeHtml(candidate.name)}" loading="lazy" onerror="this.parentElement.textContent='${escapeHtml(initials(candidate.name))}'">`
           : escapeHtml(initials(candidate.name));
 
+        let buttonText = "Chưa bắt đầu";
+        if (status.phase === "active") buttonText = alreadyVoted ? "Đã bình chọn" : "Bình chọn";
+        if (status.phase === "ended") buttonText = "Đã kết thúc";
+
         return `
           <article class="candidate">
             <div class="photo">${image}</div>
             <div class="candidate-body">
               <h2 class="candidate-name">${escapeHtml(candidate.name)}</h2>
-              <button
-                class="vote-btn"
-                type="button"
-                data-id="${candidate.id}"
-                ${alreadyVoted ? "disabled" : ""}
-              >
-                ${alreadyVoted ? "Đã bình chọn" : "Bình chọn"}
-              </button>
+              <button class="vote-btn" type="button" data-id="${candidate.id}"
+                ${(!active || alreadyVoted) ? "disabled" : ""}>${buttonText}</button>
             </div>
-          </article>
-        `;
+          </article>`;
       }).join("");
 
       grid.querySelectorAll(".vote-btn").forEach(button => {
@@ -400,18 +345,7 @@
       });
     }
 
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
     async function loadCandidates() {
-      clearNotice();
-
       const { data, error } = await supabaseClient
         .from("candidates")
         .select("id, name, image_url, sort_order")
@@ -420,86 +354,127 @@
       if (error) {
         console.error(error);
         grid.innerHTML = '<div class="loading">Không thể tải danh sách.</div>';
-        showNotice("Không kết nối được với dữ liệu. Hãy kiểm tra lại Supabase.", "error");
+        showNotice("Không kết nối được dữ liệu Supabase.", "error");
         return;
       }
 
       candidates = data || [];
       renderCandidates();
+    }
 
-      if (hasVotedLocally()) {
-        showNotice("Thiết bị này đã bình chọn. Đây là kết quả hiện tại.", "info");
-        await loadResults();
+    function updateTimerDisplay() {
+      if (status.phase === "not_started") {
+        statusLabel.textContent = "TRẠNG THÁI";
+        countdown.textContent = "CHƯA BẮT ĐẦU";
+        countdown.className = "countdown waiting";
+        return;
       }
+
+      if (status.phase === "ended") {
+        statusLabel.textContent = "TRẠNG THÁI";
+        countdown.textContent = "ĐÃ KẾT THÚC";
+        countdown.className = "countdown ended";
+        return;
+      }
+
+      if (status.phase === "active" && status.ends_at) {
+        const remaining = Math.max(0, Math.ceil((new Date(status.ends_at).getTime() - (Date.now() + serverOffsetMs)) / 1000));
+        statusLabel.textContent = "THỜI GIAN CÒN LẠI";
+        countdown.textContent = formatTime(remaining);
+        countdown.className = "countdown";
+
+        if (remaining <= 0) refreshStatus(true);
+        return;
+      }
+
+      statusLabel.textContent = "ĐANG KIỂM TRA";
+      countdown.textContent = "Vui lòng chờ...";
+      countdown.className = "countdown waiting";
+    }
+
+    async function refreshStatus(force = false) {
+      if (statusRefreshing) return;
+      statusRefreshing = true;
+      const { data, error } = await supabaseClient.rpc("get_voting_status");
+      statusRefreshing = false;
+
+      if (error) {
+        console.error(error);
+        if (force) showNotice("Không thể kiểm tra thời gian bình chọn.", "error");
+        return;
+      }
+
+      const previousPhase = status.phase;
+      const previousSession = status.starts_at;
+      status = data || { phase: "not_started" };
+      if (status.server_now) {
+        serverOffsetMs = new Date(status.server_now).getTime() - Date.now();
+      }
+
+      updateTimerDisplay();
+
+      if (previousPhase !== status.phase || previousSession !== status.starts_at || force) {
+        resultsBox.classList.remove("show");
+        renderCandidates();
+
+        if (status.phase === "not_started") {
+          clearNotice();
+        } else if (status.phase === "active") {
+          if (hasVotedLocally()) {
+            showNotice("Phiếu của bạn đã được ghi nhận. Kết quả sẽ hiện khi hết giờ.", "success");
+          } else if (previousPhase !== "active") {
+            showNotice("Cuộc bình chọn đã bắt đầu. Hãy chọn trước khi hết giờ!", "info");
+          }
+        } else if (status.phase === "ended") {
+          showNotice("Thời gian bình chọn đã kết thúc. Đây là kết quả cuối cùng.", "info");
+          await loadResults();
+        }
+      }
+
+      lastPhase = status.phase;
     }
 
     async function submitVote(candidateId) {
-      if (isSubmitting) return;
-
-      if (hasVotedLocally()) {
-        showNotice("Thiết bị này đã bình chọn rồi.", "info");
-        await loadResults();
-        return;
-      }
+      if (submitting || status.phase !== "active" || hasVotedLocally()) return;
 
       const candidate = candidates.find(item => Number(item.id) === candidateId);
       if (!candidate) return;
 
-      const confirmed = window.confirm(`Bạn xác nhận bình chọn cho “${candidate.name}”?`);
-      if (!confirmed) return;
+      if (!window.confirm(`Bạn xác nhận bình chọn cho “${candidate.name}”?`)) return;
 
-      isSubmitting = true;
-      clearNotice();
-
+      submitting = true;
       document.querySelectorAll(".vote-btn").forEach(btn => btn.disabled = true);
-
-      const voterToken = getVoterToken();
 
       const { data, error } = await supabaseClient.rpc("submit_vote", {
         p_candidate_id: candidateId,
-        p_voter_token: voterToken
+        p_voter_token: getVoterToken()
       });
 
-      isSubmitting = false;
+      submitting = false;
 
       if (error) {
         console.error(error);
-        document.querySelectorAll(".vote-btn").forEach(btn => btn.disabled = false);
         showNotice("Có lỗi khi gửi phiếu. Vui lòng thử lại.", "error");
+        renderCandidates();
         return;
       }
 
       if (!data || data.success !== true) {
         if (String(data?.message || "").includes("đã bình chọn")) {
-          localStorage.setItem("vote_completed", "true");
-          renderCandidates();
-          showNotice(data.message, "info");
-          await loadResults();
-          return;
+          localStorage.setItem("vote_completed_session", sessionKey());
         }
-
-        document.querySelectorAll(".vote-btn").forEach(btn => btn.disabled = false);
-        showNotice(data?.message || "Không thể ghi nhận phiếu bình chọn.", "error");
+        showNotice(data?.message || "Không thể ghi nhận phiếu.", "error");
+        await refreshStatus(true);
         return;
       }
 
-      localStorage.setItem("vote_completed", "true");
-      localStorage.setItem("vote_candidate_id", String(candidateId));
-
+      localStorage.setItem("vote_completed_session", sessionKey());
+      showNotice(`Đã bình chọn cho “${candidate.name}”. Kết quả sẽ hiện sau khi hết giờ.`, "success");
       renderCandidates();
-      showNotice(`Bình chọn cho “${candidate.name}” thành công!`, "success");
-      await loadResults();
-      resultsBox.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     async function loadResults() {
-      viewResultsBtn.disabled = true;
-      viewResultsBtn.textContent = "Đang tải kết quả...";
-
       const { data, error } = await supabaseClient.rpc("get_vote_results");
-
-      viewResultsBtn.disabled = false;
-      viewResultsBtn.textContent = "Cập nhật kết quả";
 
       if (error) {
         console.error(error);
@@ -511,33 +486,30 @@
       resultsBox.classList.add("show");
 
       if (!rows.length) {
-        resultList.innerHTML = '<div class="loading">Chưa có kết quả.</div>';
+        resultList.innerHTML = '<div class="loading">Chưa có phiếu bình chọn.</div>';
         return;
       }
 
       resultList.innerHTML = rows.map(row => {
         const percent = Math.max(0, Math.min(100, Number(row.percentage || 0)));
         const votes = Number(row.vote_count || 0);
-
         return `
           <div class="result-row">
-            <div class="result-name" title="${escapeHtml(row.candidate_name)}">
-              ${escapeHtml(row.candidate_name)}
-            </div>
-            <div class="bar" aria-label="${percent} phần trăm">
-              <div class="bar-fill" style="width: ${percent}%"></div>
-            </div>
-            <div class="result-number">
-              ${percent.toFixed(1)}%
-              <span class="result-votes">${votes} phiếu</span>
-            </div>
-          </div>
-        `;
+            <div class="result-name" title="${escapeHtml(row.candidate_name)}">${escapeHtml(row.candidate_name)}</div>
+            <div class="bar"><div class="bar-fill" style="width:${percent}%"></div></div>
+            <div class="result-number">${percent.toFixed(1)}%<span class="result-votes">${votes} phiếu</span></div>
+          </div>`;
       }).join("");
     }
 
-    viewResultsBtn.addEventListener("click", loadResults);
-    loadCandidates();
+    async function initialize() {
+      await Promise.all([loadCandidates(), refreshStatus(true)]);
+      updateTimerDisplay();
+      timerHandle = setInterval(updateTimerDisplay, 250);
+      setInterval(() => refreshStatus(false), 3000);
+    }
+
+    initialize();
   </script>
 </body>
 </html>
