@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b57d0" />
+  <title>Bình chọn</title>
+
+  <style>
+    :root {
+      --primary: #0b57d0;
+      --primary-dark: #073b91;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #687386;
+      --border: #dbe3ef;
+      --success: #11823b;
+      --danger: #c62828;
+      --shadow: 0 10px 30px rgba(34, 53, 84, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(11, 87, 208, 0.12), transparent 35%),
+        linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
+    }
+
+    .page {
+      width: min(1080px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 34px 0 52px;
+    }
+
+    .hero {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      color: var(--primary);
+      background: rgba(11, 87, 208, 0.09);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 6vw, 54px);
+      line-height: 1.05;
+      color: var(--primary-dark);
+    }
+
+    .subtitle {
+      margin: 13px auto 0;
+      max-width: 650px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.55;
+    }
+
+    .notice {
+      display: none;
+      margin: 0 auto 22px;
+      max-width: 760px;
+      padding: 13px 16px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .notice.show { display: block; }
+    .notice.success { color: #0b6f31; background: #e9f8ef; border: 1px solid #bde8cc; }
+    .notice.error { color: #9d1e1e; background: #fff0f0; border: 1px solid #f0c7c7; }
+    .notice.info { color: #174d91; background: #edf5ff; border: 1px solid #c9ddf8; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .candidate {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .candidate:hover {
+      transform: translateY(-4px);
+      border-color: rgba(11, 87, 208, 0.45);
+      box-shadow: 0 15px 36px rgba(34, 53, 84, 0.17);
+    }
+
+    .photo {
+      width: 100%;
+      aspect-ratio: 4 / 5;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: linear-gradient(135deg, #e9f1ff, #d7e5fb);
+      color: var(--primary);
+      font-size: 54px;
+      font-weight: 800;
+    }
+
+    .photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .candidate-body {
+      padding: 16px;
+      text-align: center;
+    }
+
+    .candidate-name {
+      min-height: 48px;
+      margin: 0 0 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      line-height: 1.25;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .vote-btn {
+      width: 100%;
+      padding: 12px 10px;
+      border-radius: 11px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary), #2477e8);
+      font-weight: 800;
+      box-shadow: 0 8px 18px rgba(11, 87, 208, 0.24);
+    }
+
+    .vote-btn:hover { filter: brightness(1.05); }
+    .vote-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      box-shadow: none;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: center;
+      margin-top: 24px;
+    }
+
+    .secondary-btn {
+      padding: 11px 18px;
+      border-radius: 10px;
+      color: var(--primary);
+      background: #fff;
+      border: 1px solid #bdd1ed;
+      font-weight: 700;
+    }
+
+    .loading {
+      grid-column: 1 / -1;
+      padding: 50px 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .results {
+      display: none;
+      margin-top: 28px;
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .results.show { display: block; }
+
+    .results h2 {
+      margin: 0 0 18px;
+      text-align: center;
+      color: var(--primary-dark);
+      font-size: 28px;
+    }
+
+    .result-row {
+      display: grid;
+      grid-template-columns: minmax(130px, 210px) 1fr 82px;
+      gap: 12px;
+      align-items: center;
+      margin: 14px 0;
+    }
+
+    .result-name {
+      font-weight: 700;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .bar {
+      height: 22px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e8eef7;
+    }
+
+    .bar-fill {
+      height: 100%;
+      min-width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--primary), #3f8cff);
+      transition: width .65s ease;
+    }
+
+    .result-number {
+      text-align: right;
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+
+    .result-votes {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    .footer-note {
+      margin: 26px auto 0;
+      max-width: 700px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 620px) {
+      .page { width: min(100% - 20px, 1080px); padding-top: 22px; }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+      .candidate-body { padding: 12px; }
+      .candidate-name { min-height: 42px; font-size: 16px; }
+      .vote-btn { padding: 11px 7px; font-size: 15px; }
+      .results { padding: 18px 14px; }
+      .result-row {
+        grid-template-columns: 105px 1fr 64px;
+        gap: 8px;
+      }
+      .result-name { font-size: 14px; }
+      .result-number { font-size: 14px; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="hero">
+      <div class="eyebrow">BÌNH CHỌN TRỰC TUYẾN</div>
+      <h1>Hãy chọn người bạn yêu thích</h1>
+      <p class="subtitle">
+        Mỗi thiết bị được bình chọn một lần. Kết quả sẽ xuất hiện ngay sau khi bạn bình chọn.
+      </p>
+    </header>
+
+    <div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+    <section id="candidateGrid" class="grid" aria-label="Danh sách bình chọn">
+      <div class="loading">Đang tải danh sách...</div>
+    </section>
+
+    <div class="toolbar">
+      <button id="viewResultsBtn" class="secondary-btn" type="button">Xem kết quả</button>
+    </div>
+
+    <section id="results" class="results" aria-label="Kết quả bình chọn">
+      <h2>Kết quả bình chọn</h2>
+      <div id="resultList"></div>
+    </section>
+
+    <p class="footer-note">
+      Phiếu bình chọn được lưu trực tiếp vào cơ sở dữ liệu Supabase.
+    </p>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://eetciufgtzxrxybteraz.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_jXMUla3Oq6exg4yglQ92KA_NUV3hrFS";
+
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+
+    const grid = document.getElementById("candidateGrid");
+    const notice = document.getElementById("notice");
+    const resultsBox = document.getElementById("results");
+    const resultList = document.getElementById("resultList");
+    const viewResultsBtn = document.getElementById("viewResultsBtn");
+
+    let candidates = [];
+    let isSubmitting = false;
+
+    function showNotice(message, type = "info") {
+      notice.textContent = message;
+      notice.className = `notice show ${type}`;
+    }
+
+    function clearNotice() {
+      notice.textContent = "";
+      notice.className = "notice";
+    }
+
+    function getVoterToken() {
+      let token = localStorage.getItem("vote_voter_token");
+
+      if (!token) {
+        token = crypto.randomUUID();
+        localStorage.setItem("vote_voter_token", token);
+      }
+
+      return token;
+    }
+
+    function hasVotedLocally() {
+      return localStorage.getItem("vote_completed") === "true";
+    }
+
+    function initials(name) {
+      return String(name || "?")
+        .trim()
+        .split(/\s+/)
+        .slice(-2)
+        .map(part => part.charAt(0))
+        .join("")
+        .toUpperCase();
+    }
+
+    function renderCandidates() {
+      if (!candidates.length) {
+        grid.innerHTML = '<div class="loading">Chưa có người nào trong danh sách bình chọn.</div>';
+        return;
+      }
+
+      const alreadyVoted = hasVotedLocally();
+
+      grid.innerHTML = candidates.map(candidate => {
+        const image = candidate.image_url
+          ? `<img src="${escapeHtml(candidate.image_url)}" alt="${escapeHtml(candidate.name)}" loading="lazy" onerror="this.parentElement.textContent='${escapeHtml(initials(candidate.name))}'">`
+          : escapeHtml(initials(candidate.name));
+
+        return `
+          <article class="candidate">
+            <div class="photo">${image}</div>
+            <div class="candidate-body">
+              <h2 class="candidate-name">${escapeHtml(candidate.name)}</h2>
+              <button
+                class="vote-btn"
+                type="button"
+                data-id="${candidate.id}"
+                ${alreadyVoted ? "disabled" : ""}
+              >
+                ${alreadyVoted ? "Đã bình chọn" : "Bình chọn"}
+              </button>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      grid.querySelectorAll(".vote-btn").forEach(button => {
+        button.addEventListener("click", () => submitVote(Number(button.dataset.id)));
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function loadCandidates() {
+      clearNotice();
+
+      const { data, error } = await supabaseClient
+        .from("candidates")
+        .select("id, name, image_url, sort_order")
+        .order("sort_order", { ascending: true });
+
+      if (error) {
+        console.error(error);
+        grid.innerHTML = '<div class="loading">Không thể tải danh sách.</div>';
+        showNotice("Không kết nối được với dữ liệu. Hãy kiểm tra lại Supabase.", "error");
+        return;
+      }
+
+      candidates = data || [];
+      renderCandidates();
+
+      if (hasVotedLocally()) {
+        showNotice("Thiết bị này đã bình chọn. Đây là kết quả hiện tại.", "info");
+        await loadResults();
+      }
+    }
+
+    async function submitVote(candidateId) {
+      if (isSubmitting) return;
+
+      if (hasVotedLocally()) {
+        showNotice("Thiết bị này đã bình chọn rồi.", "info");
+        await loadResults();
+        return;
+      }
+
+      const candidate = candidates.find(item => Number(item.id) === candidateId);
+      if (!candidate) return;
+
+      const confirmed = window.confirm(`Bạn xác nhận bình chọn cho “${candidate.name}”?`);
+      if (!confirmed) return;
+
+      isSubmitting = true;
+      clearNotice();
+
+      document.querySelectorAll(".vote-btn").forEach(btn => btn.disabled = true);
+
+      const voterToken = getVoterToken();
+
+      const { data, error } = await supabaseClient.rpc("submit_vote", {
+        p_candidate_id: candidateId,
+        p_voter_token: voterToken
+      });
+
+      isSubmitting = false;
+
+      if (error) {
+        console.error(error);
+        document.querySelectorAll(".vote-btn").forEach(btn => btn.disabled = false);
+        showNotice("Có lỗi khi gửi phiếu. Vui lòng thử lại.", "error");
+        return;
+      }
+
+      if (!data || data.success !== true) {
+        if (String(data?.message || "").includes("đã bình chọn")) {
+          localStorage.setItem("vote_completed", "true");
+          renderCandidates();
+          showNotice(data.message, "info");
+          await loadResults();
+          return;
+        }
+
+        document.querySelectorAll(".vote-btn").forEach(btn => btn.disabled = false);
+        showNotice(data?.message || "Không thể ghi nhận phiếu bình chọn.", "error");
+        return;
+      }
+
+      localStorage.setItem("vote_completed", "true");
+      localStorage.setItem("vote_candidate_id", String(candidateId));
+
+      renderCandidates();
+      showNotice(`Bình chọn cho “${candidate.name}” thành công!`, "success");
+      await loadResults();
+      resultsBox.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    async function loadResults() {
+      viewResultsBtn.disabled = true;
+      viewResultsBtn.textContent = "Đang tải kết quả...";
+
+      const { data, error } = await supabaseClient.rpc("get_vote_results");
+
+      viewResultsBtn.disabled = false;
+      viewResultsBtn.textContent = "Cập nhật kết quả";
+
+      if (error) {
+        console.error(error);
+        showNotice("Không thể tải kết quả bình chọn.", "error");
+        return;
+      }
+
+      const rows = data || [];
+      resultsBox.classList.add("show");
+
+      if (!rows.length) {
+        resultList.innerHTML = '<div class="loading">Chưa có kết quả.</div>';
+        return;
+      }
+
+      resultList.innerHTML = rows.map(row => {
+        const percent = Math.max(0, Math.min(100, Number(row.percentage || 0)));
+        const votes = Number(row.vote_count || 0);
+
+        return `
+          <div class="result-row">
+            <div class="result-name" title="${escapeHtml(row.candidate_name)}">
+              ${escapeHtml(row.candidate_name)}
+            </div>
+            <div class="bar" aria-label="${percent} phần trăm">
+              <div class="bar-fill" style="width: ${percent}%"></div>
+            </div>
+            <div class="result-number">
+              ${percent.toFixed(1)}%
+              <span class="result-votes">${votes} phiếu</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    viewResultsBtn.addEventListener("click", loadResults);
+    loadCandidates();
+  </script>
+</body>
+</html>
