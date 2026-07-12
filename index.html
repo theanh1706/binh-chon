@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b57d0">
   <title>Bình chọn trực tuyến</title>
+  <!-- PHIÊN BẢN V8: SỐ BÁO DANH + TÊN + ĐƠN VỊ CÔNG TÁC -->
   <!-- PHIÊN BẢN V7: NGOÀI TRANG BÌNH CHỌN CŨNG HIỂN THỊ ĐƠN VỊ CÔNG TÁC -->
   <!-- PHIÊN BẢN V6: TÊN + ĐƠN VỊ CÔNG TÁC -->
   <!-- PHIÊN BẢN V5: HIỂN THỊ NGƯỜI THẮNG CUỘC -->
@@ -62,6 +63,21 @@
     }
     .photo img { width:100%; height:100%; object-fit:cover; display:block; }
     .candidate-body { padding:16px; text-align:center; }
+    .candidate-sbd {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:26px;
+      margin:0 auto 8px;
+      padding:5px 11px;
+      border-radius:999px;
+      color:#fff;
+      background:linear-gradient(135deg,var(--primary),#2477e8);
+      font-size:14px;
+      line-height:1.1;
+      font-weight:900;
+      letter-spacing:.04em;
+    }
     .candidate-name {
       min-height:34px; margin:0 0 4px; display:flex; align-items:center;
       justify-content:center; font-size:19px; line-height:1.25;
@@ -142,6 +158,19 @@
       object-fit:cover;
       display:block;
     }
+    .winner-sbd {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      margin:0 auto 12px;
+      padding:8px 15px;
+      border-radius:999px;
+      color:#fff;
+      background:linear-gradient(135deg,#9b6900,#d39400);
+      font-size:clamp(17px,4vw,23px);
+      font-weight:900;
+      letter-spacing:.05em;
+    }
     .winner-name {
       margin:0;
       color:#7a4a00;
@@ -216,6 +245,18 @@
       display:block;
     }
     .other-info { min-width:0; }
+    .other-sbd {
+      display:inline-block;
+      margin-bottom:3px;
+      padding:3px 7px;
+      border-radius:999px;
+      color:#fff;
+      background:#0b57d0;
+      font-size:11px;
+      line-height:1.1;
+      font-weight:900;
+      letter-spacing:.03em;
+    }
     .other-name {
       overflow:hidden;
       text-overflow:ellipsis;
@@ -264,6 +305,7 @@
       .page { width:min(100% - 20px,1080px); padding-top:20px; }
       .grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px; }
       .candidate-body { padding:12px; }
+      .candidate-sbd { min-height:24px; margin-bottom:7px; padding:5px 9px; font-size:12px; }
       .candidate-name { min-height:28px; font-size:16px; }
       .candidate-unit { min-height:32px; font-size:12px; }
       .vote-btn { padding:11px 7px; font-size:15px; }
@@ -392,6 +434,11 @@
       return String(name || "?").trim().split(/\s+/).slice(-2)
         .map(part => part.charAt(0)).join("").toUpperCase();
     }
+    function displaySbd(value) {
+      const clean = String(value || "").trim();
+      return clean ? `SBD: ${escapeHtml(clean)}` : "SBD: --";
+    }
+
 
     function makeUuid() {
       if (crypto?.randomUUID) return crypto.randomUUID();
@@ -442,6 +489,7 @@
         return `<article class="candidate">
           <div class="photo">${image}</div>
           <div class="candidate-body">
+            <div class="candidate-sbd">${displaySbd(candidate.sbd)}</div>
             <h2 class="candidate-name">${escapeHtml(candidate.name)}</h2>
             <p class="candidate-unit">${escapeHtml(candidate.unit || "Đơn vị công tác")}</p>
             <button class="vote-btn" type="button" data-id="${candidate.id}"
@@ -458,7 +506,7 @@
     async function loadCandidates() {
       try {
         const data = await supabaseRequest(
-          "candidates?select=id,name,unit,image_url,sort_order&order=sort_order.asc",
+          "candidates?select=id,sbd,name,unit,image_url,sort_order&order=sort_order.asc",
           { method:"GET" }
         );
         candidates = Array.isArray(data) ? data : [];
@@ -618,6 +666,7 @@
 
           return `<article class="winner-card">
             ${resultPhoto(row,"winner-photo")}
+            <div class="winner-sbd">${displaySbd(row.sbd)}</div>
             <h3 class="winner-name">${escapeHtml(row.candidate_name)}</h3>
             <p class="winner-unit">${escapeHtml(row.unit || "")}</p>
             <div class="winner-votes">${votes} PHIẾU
@@ -637,6 +686,7 @@
                  return `<article class="other-card">
                    ${resultPhoto(row,"other-photo")}
                    <div class="other-info">
+                     <div class="other-sbd">${displaySbd(row.sbd)}</div>
                      <div class="other-name">${escapeHtml(row.candidate_name)}</div>
                      <div class="other-unit">${escapeHtml(row.unit || "")}</div>
                      <div class="other-bar">
