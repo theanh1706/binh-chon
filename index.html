@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b57d0">
   <title>Bình chọn trực tuyến</title>
+  <!-- PHIÊN BẢN V9: NÚT CHI TIẾT CHO TỪNG NGƯỜI -->
   <!-- PHIÊN BẢN V8: SỐ BÁO DANH + TÊN + ĐƠN VỊ CÔNG TÁC -->
   <!-- PHIÊN BẢN V7: NGOÀI TRANG BÌNH CHỌN CŨNG HIỂN THỊ ĐƠN VỊ CÔNG TÁC -->
   <!-- PHIÊN BẢN V6: TÊN + ĐƠN VỊ CÔNG TÁC -->
@@ -100,6 +101,84 @@
       box-shadow:0 8px 18px rgba(11,87,208,.24);
     }
     .vote-btn:disabled { cursor:not-allowed; opacity:.48; box-shadow:none; }
+
+    .detail-btn {
+      width:100%;
+      margin-bottom:9px;
+      padding:10px 9px;
+      border-radius:11px;
+      color:var(--primary-dark);
+      background:#fff;
+      border:1px solid #bdd1ed;
+      font-weight:900;
+    }
+    .detail-btn:hover { background:#edf5ff; }
+
+    .detail-modal {
+      position:fixed;
+      inset:0;
+      z-index:1000;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      background:rgba(10,20,40,.58);
+    }
+    .detail-modal.show { display:flex; }
+    .detail-card {
+      width:min(560px,100%);
+      max-height:82vh;
+      overflow:auto;
+      border-radius:20px;
+      background:#fff;
+      box-shadow:0 25px 70px rgba(0,0,0,.28);
+      border:1px solid var(--border);
+    }
+    .detail-head {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      padding:20px 20px 14px;
+      border-bottom:1px solid var(--border);
+      background:linear-gradient(135deg,#f7fbff,#edf5ff);
+    }
+    .detail-title {
+      margin:0;
+      color:var(--primary-dark);
+      font-size:24px;
+      line-height:1.15;
+      font-weight:900;
+    }
+    .detail-subtitle {
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.35;
+      font-weight:700;
+    }
+    .detail-close {
+      width:36px;
+      height:36px;
+      flex:0 0 auto;
+      border-radius:999px;
+      color:#fff;
+      background:#c62828;
+      font-size:22px;
+      font-weight:900;
+      line-height:1;
+    }
+    .detail-body {
+      padding:18px 20px 22px;
+      color:var(--text);
+      font-size:17px;
+      line-height:1.55;
+      white-space:pre-line;
+    }
+    .detail-empty {
+      color:var(--muted);
+      font-style:italic;
+    }
     .loading { grid-column:1/-1; padding:45px 20px; text-align:center; color:var(--muted); font-size:18px; }
     .results {
       display:none; margin-top:28px; padding:24px; border:1px solid var(--border);
@@ -309,6 +388,9 @@
       .candidate-name { min-height:28px; font-size:16px; }
       .candidate-unit { min-height:32px; font-size:12px; }
       .vote-btn { padding:11px 7px; font-size:15px; }
+      .detail-btn { padding:9px 7px; font-size:14px; }
+      .detail-title { font-size:21px; }
+      .detail-body { font-size:15px; }
       .results { padding:18px 13px; }
       .winner-card { padding:17px; }
       .winner-photo { width:min(220px,72vw); }
@@ -345,6 +427,19 @@
     </section>
 
     
+    <div id="detailModal" class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <div class="detail-card">
+        <div class="detail-head">
+          <div>
+            <h2 id="detailTitle" class="detail-title">Chi tiết</h2>
+            <p id="detailSubtitle" class="detail-subtitle"></p>
+          </div>
+          <button id="detailClose" class="detail-close" type="button" aria-label="Đóng">×</button>
+        </div>
+        <div id="detailBody" class="detail-body"></div>
+      </div>
+    </div>
+
   </main>
 
   <script>
@@ -407,6 +502,11 @@
     const countdown = document.getElementById("countdown");
     const resultsBox = document.getElementById("results");
     const resultList = document.getElementById("resultList");
+    const detailModal = document.getElementById("detailModal");
+    const detailTitle = document.getElementById("detailTitle");
+    const detailSubtitle = document.getElementById("detailSubtitle");
+    const detailBody = document.getElementById("detailBody");
+    const detailClose = document.getElementById("detailClose");
 
     let candidates = [];
     let status = { phase:"loading", starts_at:null, ends_at:null };
@@ -437,6 +537,29 @@
     function displaySbd(value) {
       const clean = String(value || "").trim();
       return clean ? `SBD: ${escapeHtml(clean)}` : "SBD: --";
+    }
+
+    function showCandidateDetail(candidateId) {
+      const candidate = candidates.find(item => Number(item.id) === candidateId);
+      if (!candidate) return;
+
+      detailTitle.textContent = candidate.name || "Chi tiết";
+
+      const sbdText = candidate.sbd ? `SBD: ${candidate.sbd}` : "";
+      const unitText = candidate.unit ? candidate.unit : "";
+      detailSubtitle.textContent = [sbdText, unitText].filter(Boolean).join(" • ");
+
+      const content = String(candidate.detail_info || "").trim();
+      detailBody.textContent = content || "Chưa có thông tin chi tiết.";
+      detailBody.className = content ? "detail-body" : "detail-body detail-empty";
+
+      detailModal.classList.add("show");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeCandidateDetail() {
+      detailModal.classList.remove("show");
+      document.body.style.overflow = "";
     }
 
 
@@ -492,11 +615,16 @@
             <div class="candidate-sbd">${displaySbd(candidate.sbd)}</div>
             <h2 class="candidate-name">${escapeHtml(candidate.name)}</h2>
             <p class="candidate-unit">${escapeHtml(candidate.unit || "Đơn vị công tác")}</p>
+            <button class="detail-btn" type="button" data-detail-id="${candidate.id}">CHI TIẾT</button>
             <button class="vote-btn" type="button" data-id="${candidate.id}"
               ${(!active || alreadyVoted) ? "disabled" : ""}>${buttonText}</button>
           </div>
         </article>`;
       }).join("");
+
+      grid.querySelectorAll(".detail-btn").forEach(button => {
+        button.addEventListener("click", () => showCandidateDetail(Number(button.dataset.detailId)));
+      });
 
       grid.querySelectorAll(".vote-btn").forEach(button => {
         button.addEventListener("click", () => submitVote(Number(button.dataset.id)));
@@ -506,7 +634,7 @@
     async function loadCandidates() {
       try {
         const data = await supabaseRequest(
-          "candidates?select=id,sbd,name,unit,image_url,sort_order&order=sort_order.asc",
+          "candidates?select=id,sbd,name,unit,detail_info,image_url,sort_order&order=sort_order.asc",
           { method:"GET" }
         );
         candidates = Array.isArray(data) ? data : [];
@@ -715,6 +843,16 @@
         showNotice(`Không thể tải kết quả: ${error.message}`,"error");
       }
     }
+
+    detailClose.addEventListener("click", closeCandidateDetail);
+
+    detailModal.addEventListener("click", event => {
+      if (event.target === detailModal) closeCandidateDetail();
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") closeCandidateDetail();
+    });
 
     async function initialize() {
       await Promise.all([loadCandidates(),refreshStatus(true)]);
