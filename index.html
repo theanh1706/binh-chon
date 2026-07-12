@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b57d0">
   <title>Bình chọn trực tuyến</title>
+  <!-- PHIÊN BẢN V7: NGOÀI TRANG BÌNH CHỌN CŨNG HIỂN THỊ ĐƠN VỊ CÔNG TÁC -->
+  <!-- PHIÊN BẢN V6: TÊN + ĐƠN VỊ CÔNG TÁC -->
   <!-- PHIÊN BẢN V5: HIỂN THỊ NGƯỜI THẮNG CUỘC -->
   <style>
     :root {
@@ -61,8 +63,19 @@
     .photo img { width:100%; height:100%; object-fit:cover; display:block; }
     .candidate-body { padding:16px; text-align:center; }
     .candidate-name {
-      min-height:48px; margin:0 0 14px; display:flex; align-items:center;
+      min-height:34px; margin:0 0 4px; display:flex; align-items:center;
       justify-content:center; font-size:19px; line-height:1.25;
+    }
+    .candidate-unit {
+      min-height:38px;
+      margin:0 0 14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#073b91;
+      font-size:14px;
+      line-height:1.3;
+      font-weight:800;
     }
     button { border:0; cursor:pointer; font:inherit; }
     .vote-btn {
@@ -136,6 +149,13 @@
       line-height:1.08;
       font-weight:900;
     }
+    .winner-unit {
+      margin:8px 0 0;
+      color:#6f5b2a;
+      font-size:clamp(17px,4vw,23px);
+      line-height:1.25;
+      font-weight:800;
+    }
     .winner-votes {
       margin-top:13px;
       color:#073b91;
@@ -203,6 +223,15 @@
       font-size:16px;
       font-weight:900;
     }
+    .other-unit {
+      margin-top:2px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+    }
     .other-bar {
       height:9px;
       margin-top:8px;
@@ -235,7 +264,8 @@
       .page { width:min(100% - 20px,1080px); padding-top:20px; }
       .grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px; }
       .candidate-body { padding:12px; }
-      .candidate-name { min-height:42px; font-size:16px; }
+      .candidate-name { min-height:28px; font-size:16px; }
+      .candidate-unit { min-height:32px; font-size:12px; }
       .vote-btn { padding:11px 7px; font-size:15px; }
       .results { padding:18px 13px; }
       .winner-card { padding:17px; }
@@ -272,7 +302,7 @@
       <div id="resultList"></div>
     </section>
 
-    <p class="footer-note">Mỗi thiết bị chỉ bình chọn một lần trong mỗi vòng.</p>
+    
   </main>
 
   <script>
@@ -413,6 +443,7 @@
           <div class="photo">${image}</div>
           <div class="candidate-body">
             <h2 class="candidate-name">${escapeHtml(candidate.name)}</h2>
+            <p class="candidate-unit">${escapeHtml(candidate.unit || "Đơn vị công tác")}</p>
             <button class="vote-btn" type="button" data-id="${candidate.id}"
               ${(!active || alreadyVoted) ? "disabled" : ""}>${buttonText}</button>
           </div>
@@ -427,7 +458,7 @@
     async function loadCandidates() {
       try {
         const data = await supabaseRequest(
-          "candidates?select=id,name,image_url,sort_order&order=sort_order.asc",
+          "candidates?select=id,name,unit,image_url,sort_order&order=sort_order.asc",
           { method:"GET" }
         );
         candidates = Array.isArray(data) ? data : [];
@@ -588,6 +619,7 @@
           return `<article class="winner-card">
             ${resultPhoto(row,"winner-photo")}
             <h3 class="winner-name">${escapeHtml(row.candidate_name)}</h3>
+            <p class="winner-unit">${escapeHtml(row.unit || "")}</p>
             <div class="winner-votes">${votes} PHIẾU
               <span>Tổng số phiếu nhận được</span>
             </div>
@@ -606,6 +638,7 @@
                    ${resultPhoto(row,"other-photo")}
                    <div class="other-info">
                      <div class="other-name">${escapeHtml(row.candidate_name)}</div>
+                     <div class="other-unit">${escapeHtml(row.unit || "")}</div>
                      <div class="other-bar">
                        <div class="other-bar-fill" style="width:${percent}%"></div>
                      </div>
